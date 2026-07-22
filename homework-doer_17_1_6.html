@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homework AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9d49a 0%, #eef4e8 45%, #cce8d4 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 210px;
+  min-width: 210px;
+  padding: 24px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+.sidebar-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6a8070;
+}
+.sidebar label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5a7060;
+  margin-bottom: 3px;
+  display: block;
+}
+.sidebar input, .sidebar select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.75);
+  font-size: 12px;
+  color: #1a2e3a;
+  font-family: inherit;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.sidebar input:focus, .sidebar select:focus { outline: 2px solid #2563eb; background: white; }
+.sidebar-btn {
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  text-align: center;
+}
+.sidebar-btn:hover { opacity: 0.88; }
+.sidebar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.sidebar-btn.blue   { background: #2563eb; color: white; }
+.sidebar-btn.green  { background: #16a34a; color: white; }
+.sidebar-btn.muted  { background: rgba(255,255,255,0.6); color: #5a7060; border: 1px solid rgba(255,255,255,0.9); }
+.sidebar-btn.orange { background: #ea580c; color: white; }
+.sidebar-btn.purple { background: #7c3aed; color: white; }
+.status { font-size: 11px; color: #6a8070; display: flex; align-items: center; gap: 5px; }
+#dot { width: 6px; height: 6px; border-radius: 50%; background: #bbb; flex-shrink: 0; }
+.sidebar hr { border: none; border-top: 1px solid rgba(0,0,0,0.08); }
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a9a8a;
+}
+
+/* ── MAIN CONTENT ── */
+.content {
+  flex: 1;
+  padding: 36px 36px 36px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 940px;
+  overflow-y: auto;
+}
+.page-header { margin-bottom: 2px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #4a6878; margin-bottom: 6px; }
+.page-header h1 { font-size: 42px; font-weight: 800; color: #0f2a40; line-height: 1.1; margin-bottom: 6px; }
+.page-header p { font-size: 15px; color: #4a6878; }
+
+/* ── CARDS ── */
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+.card-title { font-size: 17px; font-weight: 800; color: #0f2a40; margin-bottom: 14px; }
+.field-label { font-size: 14px; font-weight: 700; color: #0f2a40; margin-bottom: 8px; display: block; }
+.card select, .card textarea, .card input[type=text] {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  font-family: inherit;
+  color: #0f2a40;
+  font-size: 14px;
+}
+.card select { padding: 9px 12px; margin-bottom: 16px; appearance: auto; }
+.card select:focus { outline: 2px solid #2563eb; }
+.card textarea { padding: 12px; resize: vertical; min-height: 140px; line-height: 1.65; margin-bottom: 18px; }
+.card textarea:focus { outline: 2px solid #2563eb; }
+.card textarea::placeholder { color: #b0bec8; }
+.card input[type=text] { padding: 9px 12px; margin-bottom: 16px; }
+.card input[type=text]:focus { outline: 2px solid #2563eb; }
+
+.solve-btn {
+  background: #e8392a; color: white; border: none; border-radius: 10px;
+  padding: 10px 26px; font-size: 15px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: opacity 0.15s, transform 0.1s;
+}
+.solve-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.solve-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── SOLUTION ── */
+.solution-card { display: none; }
+.solution-card.visible { display: block; }
+.solution-title { font-size: 19px; font-weight: 800; color: #0f2a40; margin-bottom: 14px; }
+#solution-text { font-size: 15px; line-height: 1.8; color: #1e3a50; white-space: pre-wrap; word-break: break-word; min-height: 32px; }
+.thinking { color: #a0b0c0; font-style: italic; font-size: 14px; }
+.summary-box { background: #f0f7ff; border-left: 4px solid #2563eb; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 16px; font-size: 14px; color: #1e3a50; line-height: 1.6; display: none; }
+.summary-box.visible { display: block; }
+.summary-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #2563eb; margin-bottom: 4px; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 6px 14px; border: 1px solid #e2e8f0; border-radius: 20px;
+  background: white; font-size: 13px; font-weight: 500; cursor: pointer;
+  color: #4a6878; transition: all 0.15s; font-family: inherit;
+}
+.tab-btn:hover { background: #f0f7ff; border-color: #2563eb; color: #2563eb; }
+.tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SOLUTION TOGGLES / STOP ── */
+.solution-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.toggle-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.toggle-btn {
+  padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 20px;
+  background: white; font-size: 12px; font-weight: 600; cursor: pointer;
+  color: #94a3b8; transition: all 0.15s; font-family: inherit;
+}
+.toggle-btn.active { background: #eff6ff; color: #2563eb; border-color: #2563eb; }
+.toggle-btn.stop-btn { color: #dc2626; border-color: #fca5a5; }
+.toggle-btn.stop-btn:hover { background: #fee2e2; }
+.toggle-btn.stop-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── FLASHCARDS ── */
+.flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.flashcard {
+  background: #f8faff; border: 1px solid #e2e8f0; border-radius: 12px;
+  padding: 16px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  min-height: 100px; display: flex; align-items: center; justify-content: center;
+  text-align: center; font-size: 14px; color: #0f2a40; line-height: 1.5;
+}
+.flashcard:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.flashcard.flipped { background: #0f2a40; color: white; border-color: #0f2a40; }
+.flashcard-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 6px; }
+.flashcard.flipped .flashcard-label { color: #64748b; }
+
+/* ── QUIZ ── */
+.quiz-question { font-size: 15px; font-weight: 600; color: #0f2a40; margin-bottom: 14px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.quiz-option {
+  padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+  cursor: pointer; font-size: 14px; color: #0f2a40; background: white;
+  transition: all 0.15s; text-align: left; font-family: inherit;
+}
+.quiz-option:hover:not(:disabled) { background: #f0f7ff; border-color: #2563eb; }
+.quiz-option.correct { background: #dcfce7; border-color: #16a34a; color: #166534; }
+.quiz-option.wrong { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+.quiz-nav { display: flex; gap: 8px; align-items: center; }
+.quiz-progress { font-size: 12px; color: #94a3b8; margin-left: auto; }
+.quiz-score { font-size: 15px; font-weight: 700; color: #0f2a40; }
+
+/* ── CITATION ── */
+.citation-output {
+  background: #f8faff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 14px; font-size: 13px; color: #1e3a50; line-height: 1.7;
+  font-family: 'Georgia', serif; white-space: pre-wrap; word-break: break-word;
+  min-height: 60px;
+}
+.copy-btn {
+  padding: 6px 14px; background: #f1f5f9; border: 1px solid #e2e8f0;
+  border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+  color: #4a6878; font-family: inherit; margin-top: 8px; transition: all 0.15s;
+}
+.copy-btn:hover { background: #e2e8f0; }
+
+/* ── PARAPHRASE / HUMANIZER ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:700px){ .two-col { grid-template-columns: 1fr; } }
+.output-box {
+  background: #f8faff; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 14px; font-size: 14px; color: #1e3a50; line-height: 1.7;
+  min-height: 120px; white-space: pre-wrap; word-break: break-word;
+}
+
+/* ── UPGRADE BANNER ── */
+.upgrade-banner {
+  background: linear-gradient(135deg, #1e40af, #7c3aed);
+  border-radius: 14px; padding: 18px 22px; color: white;
+  display: flex; align-items: center; gap: 16px;
+}
+.upgrade-banner .ub-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.upgrade-banner .ub-text p { font-size: 13px; opacity: 0.85; }
+.upgrade-banner .ub-btn {
+  background: white; color: #1e40af; border: none; border-radius: 8px;
+  padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+  white-space: nowrap; font-family: inherit; flex-shrink: 0;
+}
+.upgrade-banner .ub-icon { font-size: 28px; flex-shrink: 0; }
+
+/* ── PRICING MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white; border-radius: 20px; padding: 32px;
+  max-width: 680px; width: 90%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal h2 { font-size: 24px; font-weight: 800; color: #0f2a40; text-align: center; margin-bottom: 6px; }
+.modal .modal-sub { text-align: center; color: #4a6878; font-size: 14px; margin-bottom: 24px; }
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media(max-width:580px){ .pricing-grid { grid-template-columns: 1fr; } }
+.pricing-card {
+  border: 2px solid #e2e8f0; border-radius: 14px; padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pricing-card.featured { border-color: #2563eb; background: #f0f7ff; }
+.pricing-card .pc-badge {
+  background: #2563eb; color: white; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px;
+  border-radius: 20px; align-self: flex-start;
+}
+.pricing-card h3 { font-size: 16px; font-weight: 800; color: #0f2a40; }
+.pricing-card .pc-price { font-size: 26px; font-weight: 800; color: #0f2a40; }
+.pricing-card .pc-price span { font-size: 13px; font-weight: 400; color: #94a3b8; }
+.pricing-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.pricing-card ul li { font-size: 13px; color: #4a6878; display: flex; gap: 6px; }
+.pricing-card ul li::before { content: '✓'; color: #16a34a; font-weight: 700; flex-shrink: 0; }
+.pricing-card .pc-btn {
+  margin-top: auto; padding: 9px; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  background: #2563eb; color: white; transition: opacity 0.15s;
+}
+.pricing-card .pc-btn:hover { opacity: 0.88; }
+.pricing-card.free .pc-btn { background: #f1f5f9; color: #4a6878; }
+.modal-close {
+  display: block; margin: 20px auto 0; background: none; border: none;
+  font-size: 13px; color: #94a3b8; cursor: pointer; font-family: inherit;
+}
+
+/* ── FLASH ── */
+.flash { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 9999; transition: opacity 0.15s; }
+
+/* ── TOOLS GRID ── */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.tool-chip {
+  padding: 8px 10px; background: #f8faff; border: 1px solid #e2e8f0;
+  border-radius: 10px; font-size: 12px; font-weight: 600; color: #4a6878;
+  cursor: pointer; text-align: center; transition: all 0.15s;
+}
+.tool-chip:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+.tool-chip.active { background: #2563eb; color: white; border-color: #2563eb; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-title">⚙️ Ollama</div>
+  <div>
+    <label>Host</label>
+    <input type="text" id="host-input" value="http://localhost:11434" />
+  </div>
+  <button class="sidebar-btn blue" onclick="connectOllama()">Connect</button>
+  <div class="status"><div id="dot"></div><span id="status-text">not connected</span></div>
+  <hr>
+  <div>
+    <label>Model</label>
+    <select id="model-select"><option value="">— connect first —</option></select>
+  </div>
+  <hr>
+  <div class="sidebar-section-title">🛠 Tools</div>
+  <button class="sidebar-btn purple" onclick="openTool('flashcards')">🃏 Flashcards</button>
+  <button class="sidebar-btn purple" onclick="openTool('quiz')">🧠 Quiz Me</button>
+  <button class="sidebar-btn purple" onclick="openTool('paraphrase')">✏️ Paraphrase</button>
+  <button class="sidebar-btn purple" onclick="openTool('citation')">📚 Citation</button>
+  <hr>
+  <button class="sidebar-btn green"  onclick="takeScreenshot()">📸 Screenshot</button>
+  <button class="sidebar-btn orange" onclick="openPricing()">⭐ Upgrade</button>
+  <button class="sidebar-btn muted"  onclick="clearAll()">⏹ Stop &amp; Clear</button>
+</div>
+
+<!-- MAIN -->
+<div class="content">
+
+  <div class="page-header">
+    <div class="eyebrow">Study Tool</div>
+    <h1>Homework AI</h1>
+    <p>Paste a question and get a structured solution.</p>
+  </div>
+
+  <!-- MAIN SOLVE CARD -->
+  <div class="card" id="main-card">
+    <label class="field-label">Subject</label>
+    <select id="subject-select">
+      <option>General</option><option>Math</option><option>Science</option>
+      <option>History</option><option>English</option><option>Computer Science</option>
+      <option>Economics</option><option>Philosophy</option><option>Chemistry</option>
+      <option>Biology</option><option>Physics</option><option>Statistics</option>
+    </select>
+    <label class="field-label">Question</label>
+    <textarea id="prompt" placeholder="Paste your homework question here…"></textarea>
+    <button class="solve-btn" id="solve-btn" onclick="solve()" disabled>Solve</button>
+  </div>
+
+  <!-- SOLUTION CARD -->
+  <div class="card solution-card visible" id="solution-card">
+    <div class="solution-head">
+      <div class="solution-title" style="margin-bottom:0;">Solution</div>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="toggle-summary-btn" onclick="toggleView('summary')">⚡ Summary</button>
+        <button class="toggle-btn active" id="toggle-solution-btn" onclick="toggleView('solution')">📄 Solution</button>
+        <button class="toggle-btn stop-btn" id="stop-btn" onclick="stopGeneration()" disabled>⏹ Stop</button>
+      </div>
+    </div>
+    <div class="summary-box" id="summary-box">
+      <div class="summary-label">⚡ Summary</div>
+      <div id="summary-text"></div>
+    </div>
+    <div id="solution-text"><span style="color:#94a3b8;">Your solution will appear here once you click Solve.</span></div>
+  </div>
+
+  <!-- TOOL PANELS -->
+  <div class="card" id="tool-panel" style="display:none;">
+
+    <!-- FLASHCARDS -->
+    <div id="panel-flashcards" class="tab-panel active">
+      <div class="card-title">🃏 Flashcard Generator</div>
+      <label class="field-label">Topic or paste notes</label>
+      <textarea id="fc-input" placeholder="e.g. Photosynthesis, World War 2 causes, Quadratic formula…" style="min-height:80px;"></textarea>
+      <button class="solve-btn" style="background:#7c3aed;" onclick="generateFlashcards()">Generate Flashcards</button>
+      <div id="fc-output" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="panel-quiz" class="tab-panel">
+      <div class="card-title">🧠 Quiz Generator</div>
+      <label class="field-label">Topic to quiz yourself on</label>
+      <textarea id="quiz-input" placeholder="e.g. Newton's laws of motion, French Revolution…" style="min-height:80px;"></textarea>
+      <button class="solve-btn" style="background:#7c3aed;" onclick="generateQuiz()">Generate Quiz</button>
+      <div id="quiz-output" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- PARAPHRASE -->
+    <div id="panel-paraphrase" class="tab-panel">
+      <div class="card-title">✏️ Paraphrase & Humanize</div>
+      <label class="field-label">Paste text to paraphrase</label>
+      <textarea id="para-input" placeholder="Paste your text here…" style="min-height:100px;"></textarea>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="tab-btn active" id="para-mode-standard" onclick="setParaMode('standard')">Standard</button>
+        <button class="tab-btn" id="para-mode-formal"   onclick="setParaMode('formal')">Formal</button>
+        <button class="tab-btn" id="para-mode-simple"   onclick="setParaMode('simple')">Simplify</button>
+        <button class="tab-btn" id="para-mode-humanize" onclick="setParaMode('humanize')">Humanize AI</button>
+      </div>
+      <button class="solve-btn" style="background:#7c3aed;" onclick="doParaphrase()">Paraphrase</button>
+      <div id="para-output" class="output-box" style="margin-top:14px;display:none;"></div>
+      <button class="copy-btn" id="para-copy" style="display:none;" onclick="copyText('para-output')">Copy</button>
+    </div>
+
+    <!-- CITATION -->
+    <div id="panel-citation" class="tab-panel">
+      <div class="card-title">📚 Citation Generator</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <button class="tab-btn active" id="cite-apa"     onclick="setCiteStyle('APA')">APA</button>
+        <button class="tab-btn"        id="cite-mla"     onclick="setCiteStyle('MLA')">MLA</button>
+        <button class="tab-btn"        id="cite-chicago" onclick="setCiteStyle('Chicago')">Chicago</button>
+        <button class="tab-btn"        id="cite-harvard" onclick="setCiteStyle('Harvard')">Harvard</button>
+      </div>
+      <!-- Source type tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="tab-btn active" id="cite-src-manual" onclick="setCiteSrc('manual')">✏️ Manual</button>
+        <button class="tab-btn" id="cite-src-url" onclick="setCiteSrc('url')">🔗 From URL</button>
+      </div>
+
+      <!-- Manual fields -->
+      <div id="cite-manual-fields">
+        <label class="field-label">Author(s)</label>
+        <input type="text" id="cite-author" placeholder="e.g. Smith, John" />
+        <label class="field-label">Title</label>
+        <input type="text" id="cite-title" placeholder="e.g. Introduction to Biology" />
+        <label class="field-label">Year</label>
+        <input type="text" id="cite-year" placeholder="e.g. 2023" />
+        <label class="field-label">Publisher / Journal</label>
+        <input type="text" id="cite-pub" placeholder="e.g. Oxford University Press" />
+        <button class="solve-btn" style="background:#7c3aed;" onclick="generateCitation()">Generate Citation</button>
+      </div>
+
+      <!-- URL fields -->
+      <div id="cite-url-fields" style="display:none;">
+        <label class="field-label">Website URL</label>
+        <input type="text" id="cite-url" placeholder="e.g. https://en.wikipedia.org/wiki/Photosynthesis" />
+        <label class="field-label">Date Accessed</label>
+        <input type="text" id="cite-accessed" placeholder="e.g. March 1, 2026" />
+        <button class="solve-btn" style="background:#7c3aed;" onclick="generateUrlCitation()">Cite This URL</button>
+        <p style="font-size:11px;color:#94a3b8;margin-top:8px;">Paste the URL and we'll extract the title, author and date automatically.</p>
+      </div>
+      <div id="cite-output" class="citation-output" style="margin-top:14px;display:none;"></div>
+      <button class="copy-btn" id="cite-copy" style="display:none;" onclick="copyText('cite-output')">Copy Citation</button>
+    </div>
+
+  </div>
+
+  <!-- UPGRADE BANNER -->
+  <div class="upgrade-banner">
+    <div class="ub-icon">🚀</div>
+    <div class="ub-text">
+      <h3>Unlock Pro Features</h3>
+      <p>Advanced reasoning, AI detector, diagram generator, unlimited history & more</p>
+    </div>
+    <button class="ub-btn" onclick="openPricing()">See Plans</button>
+  </div>
+
+</div>
+
+<!-- PRICING MODAL -->
+<div class="modal-overlay" id="pricing-modal">
+  <div class="modal">
+    <h2>Choose Your Plan</h2>
+    <p class="modal-sub">Power up your studies with Pro features</p>
+    <div class="pricing-grid">
+      <div class="pricing-card free">
+        <h3>Free</h3>
+        <div class="pc-price">$0 <span>/mo</span></div>
+        <ul>
+          <li>Homework solver</li>
+          <li>LaTeX rendering</li>
+          <li>Summary + solution</li>
+          <li>Screenshot</li>
+          <li>Basic flashcards</li>
+        </ul>
+        <button class="pc-btn">Current Plan</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pc-badge">Most Popular</div>
+        <h3>Student Pro</h3>
+        <div class="pc-price">$9 <span>/mo</span></div>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Advanced reasoning mode</li>
+          <li>Unlimited flashcards & quizzes</li>
+          <li>AI detector & humanizer</li>
+          <li>Diagram generator</li>
+          <li>Citation generator (all styles)</li>
+          <li>Solution history</li>
+          <li>Ad-free experience</li>
+        </ul>
+        <button class="pc-btn" onclick="alert('Payment integration coming soon!')">Upgrade to Pro</button>
+      </div>
+      <div class="pricing-card">
+        <h3>Expert</h3>
+        <div class="pc-price">$19 <span>/mo</span></div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Live AI video tutor</li>
+          <li>Document upload & analysis</li>
+          <li>PowerPoint generator</li>
+          <li>Research assistant</li>
+          <li>Priority support</li>
+          <li>API access</li>
+        </ul>
+        <button class="pc-btn" onclick="alert('Payment integration coming soon!')">Upgrade to Expert</button>
+      </div>
+    </div>
+    <button class="modal-close" onclick="closePricing()">✕ Close</button>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script>
+var busy = false;
+var paraMode = 'standard';
+var citeStyle = 'APA';
+var quizData = [];
+var quizIndex = 0;
+var quizScore = 0;
+var summaryVisible = true;
+var solutionVisible = true;
+var activeXHRs = [];
+
+/* ── STATUS ── */
+function setStatus(color, text) {
+  document.getElementById('dot').style.background = color;
+  document.getElementById('status-text').textContent = text;
+}
+
+/* ── CONNECT ── */
+function connectOllama() {
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  setStatus('#f59e0b', 'connecting…');
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', host + '/api/tags', true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var models = data.models || [];
+        var sel = document.getElementById('model-select');
+        sel.innerHTML = '';
+        models.forEach(function(m) {
+          var opt = document.createElement('option');
+          opt.value = m.name; opt.textContent = m.name;
+          sel.appendChild(opt);
+        });
+        if (models.length > 0) {
+          sel.value = models[0].name;
+          document.getElementById('solve-btn').disabled = false;
+        }
+        setStatus('#22c55e', models.length + ' model(s) loaded');
+      } catch(e) { setStatus('#ef4444', 'parse error'); }
+    } else { setStatus('#ef4444', 'HTTP ' + xhr.status); }
+  };
+  xhr.onerror = function() {
+    setStatus('#ef4444', 'failed');
+    alert('Cannot reach Ollama.\n\nRun: OLLAMA_ORIGINS="*" ollama serve');
+  };
+  xhr.send();
+}
+
+document.getElementById('model-select').onchange = function() {
+  document.getElementById('solve-btn').disabled = !this.value;
+};
+
+/* ── CLEAR (also stops any in-progress AI response) ── */
+function clearAll() {
+  stopGeneration();
+  document.getElementById('prompt').value = '';
+  document.getElementById('solution-text').innerHTML = '<span style="color:#94a3b8;">Your solution will appear here once you click Solve.</span>';
+  document.getElementById('solution-text').style.display = '';
+  document.getElementById('summary-box').classList.remove('visible');
+  document.getElementById('summary-box').style.display = '';
+  document.getElementById('summary-text').textContent = '';
+  summaryVisible = true;
+  solutionVisible = true;
+  document.getElementById('toggle-summary-btn').classList.add('active');
+  document.getElementById('toggle-solution-btn').classList.add('active');
+}
+
+/* ── STOP (aborts any in-flight Ollama requests without waiting for them to finish) ── */
+function stopGeneration() {
+  activeXHRs.forEach(function(x) { try { x.abort(); } catch(e) {} });
+  activeXHRs = [];
+  if (busy) {
+    var st = document.getElementById('solution-text');
+    if (st && st.innerHTML.indexOf('thinking') !== -1) {
+      st.innerHTML = '<span style="color:#94a3b8;">Stopped.</span>';
+    }
+  }
+  busy = false;
+  var solveBtn = document.getElementById('solve-btn');
+  if (solveBtn) solveBtn.disabled = !document.getElementById('model-select').value;
+  var stopBtn = document.getElementById('stop-btn');
+  if (stopBtn) stopBtn.disabled = true;
+}
+
+/* ── TOGGLE SOLUTION / SUMMARY VISIBILITY ── */
+function toggleView(which) {
+  if (which === 'summary') {
+    summaryVisible = !summaryVisible;
+    document.getElementById('toggle-summary-btn').classList.toggle('active', summaryVisible);
+    document.getElementById('summary-box').style.display = summaryVisible ? '' : 'none';
+  } else {
+    solutionVisible = !solutionVisible;
+    document.getElementById('toggle-solution-btn').classList.toggle('active', solutionVisible);
+    document.getElementById('solution-text').style.display = solutionVisible ? '' : 'none';
+  }
+}
+
+/* ── LATEX ── */
+function renderLatex(el) {
+  if (window.MathJax && window.MathJax.typesetPromise) MathJax.typesetPromise([el]).catch(function(){});
+}
+function renderStreaming(el, text, isFinal) {
+  var re = /(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\))/g;
+  var segments = [], lastIndex = 0, match;
+  re.lastIndex = 0;
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > lastIndex) segments.push({ type:'text', content: text.slice(lastIndex, match.index) });
+    segments.push({ type:'math', content: match[0] });
+    lastIndex = re.lastIndex;
+  }
+  var tail = text.slice(lastIndex);
+  if (tail) segments.push({ type: isFinal ? 'math' : 'text', content: tail });
+  var html = '';
+  segments.forEach(function(seg) {
+    var safe = seg.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    html += seg.type === 'text' ? '<span>' + safe + '</span>' : '<span class="mjx">' + safe + '</span>';
+  });
+  el.innerHTML = html;
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    var spans = el.querySelectorAll('.mjx:not([data-rendered])');
+    if (spans.length) {
+      spans.forEach(function(s){ s.setAttribute('data-rendered','1'); });
+      MathJax.typesetPromise(Array.from(spans)).catch(function(){});
+    }
+  }
+}
+
+/* ── STREAM HELPER ── */
+function streamXHR(host, payload, onChunk, onDone, onError) {
+  var xhr = new XMLHttpRequest();
+  activeXHRs.push(xhr);
+  function unregister() {
+    var i = activeXHRs.indexOf(xhr);
+    if (i > -1) activeXHRs.splice(i, 1);
+  }
+  xhr.open('POST', host + '/api/chat', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  var parsed = 0;
+  xhr.onprogress = function() {
+    var chunk = xhr.responseText.slice(parsed);
+    parsed = xhr.responseText.length;
+    chunk.split('\n').forEach(function(line) {
+      if (!line.trim()) return;
+      try { var j = JSON.parse(line); if (j.message && j.message.content) onChunk(j.message.content); } catch(e) {}
+    });
+  };
+  xhr.onload = function() { unregister(); onDone(); };
+  xhr.onerror = function() { unregister(); onError(); };
+  xhr.onabort = function() { unregister(); };
+  xhr.send(JSON.stringify(payload));
+  return xhr;
+}
+
+/* ── SOLVE ── */
+function solve() {
+  if (busy) return;
+  var model = document.getElementById('model-select').value;
+  var subject = document.getElementById('subject-select').value;
+  var question = document.getElementById('prompt').value.trim();
+  if (!model || !question) return;
+  if (!summaryVisible && !solutionVisible) {
+    alert('Turn Summary or Solution back on (top of the answer card) to generate something.');
+    return;
+  }
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  busy = true;
+  document.getElementById('solve-btn').disabled = true;
+  document.getElementById('stop-btn').disabled = false;
+  var sc = document.getElementById('solution-card');
+  var st = document.getElementById('solution-text');
+  var sb = document.getElementById('summary-box');
+  var sbText = document.getElementById('summary-text');
+  sc.classList.add('visible');
+  sb.classList.remove('visible');
+  st.style.display = solutionVisible ? '' : 'none';
+  sb.style.display = summaryVisible ? '' : 'none';
+  st.innerHTML = solutionVisible
+    ? '<span class="thinking">Thinking…</span>'
+    : '<span style="color:#94a3b8;">Solution is toggled off — turn it back on and click Solve to generate it.</span>';
+  sc.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  function finish() {
+    busy = false;
+    document.getElementById('solve-btn').disabled = false;
+    document.getElementById('stop-btn').disabled = true;
+  }
+
+  function runSolution() {
+    if (!solutionVisible) { finish(); return; }
+    st.innerHTML = '<span class="thinking">Thinking…</span>';
+    var fullText = '';
+    streamXHR(host,
+      { model:model, stream:true, messages:[
+        { role:'system', content:'You are a helpful homework tutor specializing in '+subject+'. Give clear, structured, step-by-step solutions. Use LaTeX for all math: inline with $...$ and display with $$...$$' },
+        { role:'user', content:question }
+      ]},
+      function(chunk) {
+        if (!fullText) st.innerHTML = '';
+        fullText += chunk;
+        renderStreaming(st, fullText);
+      },
+      function() {
+        if (!fullText) st.textContent = 'No response received.';
+        else renderStreaming(st, fullText, true);
+        finish();
+      },
+      function() {
+        st.textContent = 'Error: Could not reach Ollama.';
+        finish();
+      }
+    );
+  }
+
+  if (summaryVisible) {
+    var summaryText = '';
+    streamXHR(host,
+      { model:model, stream:true, messages:[
+        { role:'system', content:'Give a single sentence (max 20 words) summary of the answer. No preamble. Use LaTeX for math.' },
+        { role:'user', content:question }
+      ]},
+      function(chunk) {
+        summaryText += chunk;
+        sbText.textContent = summaryText;
+        sb.classList.add('visible');
+      },
+      function() {
+        if (summaryText) renderLatex(sbText);
+        runSolution();
+      },
+      function() {
+        // summary failed; fall through to solution (or finish if solution is off too)
+        runSolution();
+      }
+    );
+  } else {
+    runSolution();
+  }
+}
+
+/* ── TOOL PANEL ── */
+function openTool(name) {
+  document.getElementById('tool-panel').style.display = 'block';
+  ['flashcards','quiz','paraphrase','citation'].forEach(function(t) {
+    document.getElementById('panel-'+t).classList.toggle('active', t === name);
+  });
+  document.getElementById('tool-panel').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ── FLASHCARDS ── */
+function generateFlashcards() {
+  var model = document.getElementById('model-select').value;
+  if (!model) { alert('Connect to Ollama first.'); return; }
+  var topic = document.getElementById('fc-input').value.trim();
+  if (!topic) return;
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  var out = document.getElementById('fc-output');
+  out.innerHTML = '<span class="thinking">Generating flashcards…</span>';
+
+  var fullText = '';
+  streamXHR(host,
+    { model: model, stream: true, messages: [
+      { role: 'user', content: 'Make 6 flashcards about: ' + topic + '\n\nUse this exact format:\nQ: question\nA: answer\n\nQ: question\nA: answer\n\nOnly output the flashcards, nothing else.' }
+    ]},
+    function(chunk) {
+      fullText += chunk;
+      var count = (fullText.match(/^Q:/gm) || []).length;
+      if (count > 0) out.innerHTML = '<span class="thinking">Generated ' + count + ' / 6 cards…</span>';
+    },
+    function() {
+      var cards = [];
+      var lines = fullText.split('\n');
+      var currentQ = null;
+      lines.forEach(function(line) {
+        line = line.trim();
+        if (/^Q:/i.test(line)) {
+          currentQ = line.replace(/^Q:\s*/i, '');
+        } else if (/^A:/i.test(line) && currentQ) {
+          cards.push({ front: currentQ, back: line.replace(/^A:\s*/i, '') });
+          currentQ = null;
+        }
+      });
+
+      if (cards.length === 0) {
+        out.innerHTML = '<div style="color:#ef4444;font-size:13px;">Could not parse cards. Raw output:</div>'
+          + '<div style="white-space:pre-wrap;font-size:12px;color:#666;margin-top:6px;">' + escHtml(fullText) + '</div>';
+        return;
+      }
+
+      var html = '<div class="flashcard-grid">';
+      cards.forEach(function(c) {
+        html += '<div class="flashcard" onclick="flipCard(this)" data-front="' + escHtml(c.front) + '" data-back="' + escHtml(c.back) + '">'
+          + '<div><div class="flashcard-label">Question</div>' + escHtml(c.front) + '</div></div>';
+      });
+      html += '</div><p style="font-size:12px;color:#94a3b8;margin-top:8px;">Click a card to flip</p>';
+      out.innerHTML = html;
+    },
+    function() { out.innerHTML = '<span style="color:red">Error connecting to Ollama.</span>'; }
+  );
+}
+
+function flipCard(el) {
+  var isFlipped = el.classList.contains('flipped');
+  var front = el.getAttribute('data-front');
+  var back = el.getAttribute('data-back');
+  if (isFlipped) {
+    el.classList.remove('flipped');
+    el.innerHTML = '<div><div class="flashcard-label">Question</div>'+front+'</div>';
+  } else {
+    el.classList.add('flipped');
+    el.innerHTML = '<div><div class="flashcard-label">Answer</div>'+back+'</div>';
+  }
+}
+
+/* ── QUIZ ── */
+function generateQuiz() {
+  var model = document.getElementById('model-select').value;
+  if (!model) { alert('Connect to Ollama first.'); return; }
+  var topic = document.getElementById('quiz-input').value.trim();
+  if (!topic) return;
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  var out = document.getElementById('quiz-output');
+  out.innerHTML = '<span class="thinking">Generating quiz…</span>';
+  var fullText = '';
+  streamXHR(host,
+    { model: model, stream: true, messages: [
+      { role: 'user', content: 'Write 5 multiple choice questions about: ' + topic + '\n\nUse this exact format for each:\n\nQ: question\nA) option\nB) option\nC) option\nD) option\nAnswer: A\n\nOnly output the questions. No extra text.' }
+    ]},
+    function(chunk) {
+      fullText += chunk;
+      var count = (fullText.match(/^Q:/gm) || []).length;
+      if (count > 0) out.innerHTML = '<span class="thinking">Generated ' + count + ' / 5 questions…</span>';
+    },
+    function() {
+      // Parse questions
+      quizData = [];
+      var blocks = fullText.trim().split(/\n\s*\n/);
+      blocks.forEach(function(block) {
+        var lines = block.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+        var q = null, opts = [], ans = null;
+        lines.forEach(function(line) {
+          if (/^Q:/i.test(line))           q = line.replace(/^Q:\s*/i, '').trim();
+          else if (/^[ABCD]\)/i.test(line)) opts.push(line);
+          else if (/^Answer:/i.test(line))  ans = line.replace(/^Answer:\s*/i,'').trim().charAt(0).toUpperCase();
+        });
+        if (q && opts.length >= 2 && ans) quizData.push({ question: q, options: opts, answer: ans });
+      });
+
+      if (quizData.length === 0) {
+        out.innerHTML = '<div style="color:#ef4444;font-size:13px;">Could not parse quiz. Raw output:</div>'
+          + '<div style="white-space:pre-wrap;font-size:12px;color:#666;margin-top:6px;">' + escHtml(fullText) + '</div>';
+        return;
+      }
+      quizIndex = 0; quizScore = 0;
+      showQuizQuestion(out);
+    },
+    function() { out.innerHTML = '<span style="color:red">Error connecting to Ollama.</span>'; }
+  );
+}
+
+function showQuizQuestion(out) {
+  if (quizIndex >= quizData.length) {
+    out.innerHTML = '<div class="quiz-score">Quiz complete! Score: '+quizScore+' / '+quizData.length+'</div>'
+      +'<button class="solve-btn" style="background:#7c3aed;margin-top:12px;" onclick="generateQuiz()">Retry</button>';
+    return;
+  }
+  var q = quizData[quizIndex];
+  var html = '<div class="quiz-question">Q'+(quizIndex+1)+'. '+escHtml(q.question)+'</div><div class="quiz-options">';
+  q.options.forEach(function(opt) {
+    html += '<button class="quiz-option" onclick="answerQuiz(this,\''+escHtml(q.answer)+'\')">'+escHtml(opt)+'</button>';
+  });
+  html += '</div><div class="quiz-progress">'+( quizIndex+1)+' / '+quizData.length+' &nbsp;|&nbsp; Score: '+quizScore+'</div>';
+  out.innerHTML = html;
+}
+
+function answerQuiz(btn, correct) {
+  var chosen = btn.textContent.trim().charAt(0);
+  var allBtns = btn.parentNode.querySelectorAll('.quiz-option');
+  allBtns.forEach(function(b) {
+    b.disabled = true;
+    if (b.textContent.trim().charAt(0) === correct) b.classList.add('correct');
+  });
+  if (chosen === correct) { btn.classList.add('correct'); quizScore++; }
+  else btn.classList.add('wrong');
+  quizIndex++;
+  var out = document.getElementById('quiz-output');
+  setTimeout(function(){ showQuizQuestion(out); }, 900);
+}
+
+/* ── PARAPHRASE ── */
+function setParaMode(m) {
+  paraMode = m;
+  ['standard','formal','simple','humanize'].forEach(function(x) {
+    document.getElementById('para-mode-'+x).classList.toggle('active', x===m);
+  });
+}
+function doParaphrase() {
+  var model = document.getElementById('model-select').value;
+  if (!model) { alert('Connect to Ollama first.'); return; }
+  var text = document.getElementById('para-input').value.trim();
+  if (!text) return;
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  var out = document.getElementById('para-output');
+  var copyBtn = document.getElementById('para-copy');
+  out.style.display = 'block';
+  out.textContent = 'Working…';
+  copyBtn.style.display = 'none';
+  var prompts = {
+    standard: 'Paraphrase the following text in a clear, natural way. Return only the paraphrased text.',
+    formal:   'Rewrite the following text in a formal, academic tone. Return only the rewritten text.',
+    simple:   'Simplify the following text for a younger audience. Return only the simplified text.',
+    humanize: 'Rewrite the following AI-generated text to sound natural and human-written. Vary sentence structure. Return only the rewritten text.'
+  };
+  var fullText = '';
+  streamXHR(host,
+    { model:model, stream:true, messages:[
+      { role:'system', content: prompts[paraMode] },
+      { role:'user', content: text }
+    ]},
+    function(chunk) { fullText += chunk; out.textContent = fullText; },
+    function() { copyBtn.style.display = 'block'; },
+    function() { out.textContent = 'Error.'; }
+  );
+}
+
+/* ── CITATION ── */
+function setCiteStyle(s) {
+  citeStyle = s;
+  ['APA','MLA','Chicago','Harvard'].forEach(function(x){
+    document.getElementById('cite-'+x.toLowerCase()).classList.toggle('active', x===s);
+  });
+}
+
+function setCiteSrc(mode) {
+  document.getElementById('cite-src-manual').classList.toggle('active', mode==='manual');
+  document.getElementById('cite-src-url').classList.toggle('active', mode==='url');
+  document.getElementById('cite-manual-fields').style.display = mode==='manual' ? 'block' : 'none';
+  document.getElementById('cite-url-fields').style.display   = mode==='url'    ? 'block' : 'none';
+}
+
+function generateUrlCitation() {
+  var model = document.getElementById('model-select').value;
+  if (!model) { alert('Connect to Ollama first.'); return; }
+  var url      = document.getElementById('cite-url').value.trim();
+  var accessed = document.getElementById('cite-accessed').value.trim() || new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  if (!url) { alert('Please enter a URL.'); return; }
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  var out     = document.getElementById('cite-output');
+  var copyBtn = document.getElementById('cite-copy');
+  out.style.display = 'block';
+  out.textContent = 'Generating citation from URL…';
+  copyBtn.style.display = 'none';
+  var fullText = '';
+  // Ask the model to format a website citation from the URL info it knows, or make a best-effort citation
+  streamXHR(host,
+    { model: model, stream: true, messages: [
+      { role: 'system', content: 'You are a citation expert. The user provides a URL and an access date. Generate a properly formatted '+citeStyle+' website citation. If you recognize the site, use the real title and author/organization. If not, infer reasonable values from the URL. Include the URL and access date. Return ONLY the formatted citation, nothing else.' },
+      { role: 'user',   content: 'URL: ' + url + '\nAccessed: ' + accessed }
+    ]},
+    function(chunk) { fullText += chunk; out.textContent = fullText; },
+    function() { copyBtn.style.display = 'block'; },
+    function() { out.textContent = 'Error connecting to Ollama.'; }
+  );
+}
+function generateCitation() {
+  var model = document.getElementById('model-select').value;
+  if (!model) { alert('Connect to Ollama first.'); return; }
+  var author = document.getElementById('cite-author').value.trim();
+  var title  = document.getElementById('cite-title').value.trim();
+  var year   = document.getElementById('cite-year').value.trim();
+  var pub    = document.getElementById('cite-pub').value.trim();
+  if (!title) { alert('Please enter at least a title.'); return; }
+  var host = document.getElementById('host-input').value.trim().replace(/\/$/, '');
+  var out = document.getElementById('cite-output');
+  var copyBtn = document.getElementById('cite-copy');
+  out.style.display = 'block';
+  out.textContent = 'Generating citation…';
+  copyBtn.style.display = 'none';
+  var fullText = '';
+  streamXHR(host,
+    { model:model, stream:true, messages:[
+      { role:'system', content:'Generate a single '+citeStyle+' citation. Return ONLY the formatted citation, nothing else.' },
+      { role:'user', content:'Author: '+author+'\nTitle: '+title+'\nYear: '+year+'\nPublisher/Journal: '+pub }
+    ]},
+    function(chunk) { fullText += chunk; out.textContent = fullText; },
+    function() { copyBtn.style.display = 'block'; },
+    function() { out.textContent = 'Error.'; }
+  );
+}
+
+/* ── COPY ── */
+function copyText(id) {
+  var el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(function() {
+    var btn = el.nextElementSibling;
+    var orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  });
+}
+
+/* ── SCREENSHOT ── */
+function takeScreenshot() {
+  var flash = document.getElementById('flash');
+  flash.style.opacity = '0.5';
+  setTimeout(function(){ flash.style.opacity = '0'; }, 200);
+  var target = document.getElementById('solution-card');
+  if (!target || !target.classList.contains('visible')) target = document.querySelector('.content');
+  html2canvas(target, { backgroundColor:'#ffffff', scale:2, useCORS:true, allowTaint:true, logging:false,
+    ignoreElements: function(el){ return el.id==='flash'; }
+  }).then(function(canvas) {
+    var link = document.createElement('a');
+    link.download = 'homework-'+Date.now()+'.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }).catch(function(){ window.print(); });
+}
+
+/* ── PRICING MODAL ── */
+function openPricing()  { document.getElementById('pricing-modal').classList.add('open'); }
+function closePricing() { document.getElementById('pricing-modal').classList.remove('open'); }
+document.getElementById('pricing-modal').addEventListener('click', function(e){ if(e.target===this) closePricing(); });
+
+/* ── UTILS ── */
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── KEYBOARD ── */
+document.getElementById('prompt').addEventListener('keydown', function(e) {
+  if (e.key==='Enter' && e.metaKey && !document.getElementById('solve-btn').disabled) solve();
+});
+</script>
+</body>
+</html>
